@@ -6,7 +6,7 @@ class ClientAuthController < ApplicationController
             token = JsonWebToken.encode({ user_id: @user.id, is_admin: false })
             time = Time.now + 24.hours.to_i
             render json: { success: true, token: token, exp: time.strftime("%d/%m/%Y %H:%M"), name: @user.name, email:
-                @user.email },
+                @user.email, id: @user.id, address: @user.address, phone: @user.phone },
                    status:
                 :ok
         else
