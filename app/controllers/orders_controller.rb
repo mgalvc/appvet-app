@@ -80,6 +80,14 @@ class OrdersController < ApplicationController
         render json: @items, include: [:product], status: :ok
     end
 
+    # DELETE /orders/:id
+    def destroy
+        @order = Order.find(params[:id])
+        @order.items.delete_all
+        @order.destroy
+        render json: { message: 'Order destroyed' }, status: :ok
+    end
+
     private
 
     def order_params
