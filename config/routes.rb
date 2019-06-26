@@ -14,6 +14,8 @@ Rails.application.routes.draw do
 
     get '/clients/:id/waiting_items', to: 'clients#get_waiting_items'
 
+    put '/send_order/:id', to: 'orders#send_order'
+
     put '/products/:id/increment', to: 'products#increment'
     put '/products/:id/sold', to: 'products#sold'
 

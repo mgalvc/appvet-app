@@ -1,5 +1,45 @@
 class OrdersController < ApplicationController
     before_action :authorize_request
+    before_action :find_order, only: [:destroy, :send_order, :items]
+
+    def send_order
+        # run through items just to check if there are enough products to deliver
+        errors = []
+
+        for item in @order.items
+            if item.quantity > item.product.quantity
+                errors.push("Você não tem estoque suficiente de #{item.product.name} para esta entrega.")
+            end
+        end
+
+        if errors.size > 0
+            render json: {
+                success: false,
+                alerts: {
+                    status: 'danger',
+                    title: 'Erro'
+                },
+                message: 'Verifique os erros e tente novamente',
+                errors: errors
+            }, status: :ok
+            return
+        end
+
+        for item in @order.items
+            item.product.decrement(:quantity, item.quantity).save
+        end
+
+        @order.update(status: 'sent')
+
+        render json: {
+            success: true,
+            alerts: {
+                status: 'success',
+                title: 'Sucesso'
+            },
+            message: 'Ordem enviada com sucesso'
+        }, status: :created
+    end
 
     # POST /orders
     def create
@@ -76,19 +116,22 @@ class OrdersController < ApplicationController
 
     # GET /order_items/:id
     def items
-        @items = Order.find(params[:id]).items.includes(:product)
+        @items = @order.items.includes(:product)
         render json: @items, include: [:product], status: :ok
     end
 
     # DELETE /orders/:id
     def destroy
-        @order = Order.find(params[:id])
         @order.items.delete_all
         @order.destroy
         render json: { message: 'Order destroyed' }, status: :ok
     end
 
     private
+
+    def find_order
+        @order = Order.find(params[:id])
+    end
 
     def order_params
         params.permit(:status, :price, :client_id, :delivery_address, items: [])
