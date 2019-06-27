@@ -1,6 +1,6 @@
 class ClientsController < ApplicationController
     before_action :authorize_request, except: :create
-    before_action :find_client, only: [:update, :destroy, :get_waiting_items]
+    before_action :find_client, only: [:update, :destroy, :get_waiting_items, :get_sent_items]
 
     # POST /clients
     def create
@@ -85,6 +85,31 @@ class ClientsController < ApplicationController
                     quantity: item.quantity,
                     picture: product.picture,
                     status: order.status
+                           })
+            end
+        end
+
+        render json: { items: items }, status: :ok
+    rescue ActiveRecord::RecordNotFound
+        render json: { error: 'No orders found' }, status: :not_found
+    end
+
+    # GET /clients/:id/sent_items
+    def get_sent_items
+        # each order has a list of items
+        orders = @client.orders.where(status: 'sent')
+        items = []
+
+        for order in orders
+            for item in order.items
+                product = Product.find(item.product_id)
+                items.push({
+                               id: item.id,
+                               name: product.name,
+                               price: item.price,
+                               quantity: item.quantity,
+                               picture: product.picture,
+                               status: order.status
                            })
             end
         end

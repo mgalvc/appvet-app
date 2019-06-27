@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     get '/order_items/:id', to: 'orders#items'
 
     get '/clients/:id/waiting_items', to: 'clients#get_waiting_items'
+    get '/clients/:id/sent_items', to: 'clients#get_sent_items'
 
     put '/send_order/:id', to: 'orders#send_order'
 

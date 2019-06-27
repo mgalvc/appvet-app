@@ -72,7 +72,12 @@ class OrdersController < ApplicationController
     end
 
     def index_grouped
-        @orders = Order.all.group_by(&:status)
+        if params[:status]
+            @orders = Order.where(status: params[:status]).group_by(&:status)
+        else
+            @orders = Order.all.group_by(&:status)
+        end
+
         render json: { orders: @orders }, include: [:items], status: :ok
     end
 
