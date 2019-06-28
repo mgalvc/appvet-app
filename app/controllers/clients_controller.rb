@@ -66,7 +66,7 @@ class ClientsController < ApplicationController
     # DELETE /clients/:id
     def destroy
         @client.destroy
-        render json: { message: 'Client destroyed' }, status: :ok
+        render json: { message: 'Cliente destruído' }, status: :ok
     end
 
     # GET /clients/:id/waiting_items
