@@ -1,6 +1,19 @@
 class OrdersController < ApplicationController
     before_action :authorize_request
-    before_action :find_order, only: [:destroy, :send_order, :items]
+    before_action :find_order, only: [:destroy, :send_order, :receive_order, :items]
+
+    def receive_order
+        @order.update(status: 'received')
+
+        render json: {
+            success: true,
+            alerts: {
+                status: 'success',
+                title: 'Sucesso'
+            },
+            message: 'Ordem recebida com sucesso'
+        }, status: :created
+    end
 
     def send_order
         # run through items just to check if there are enough products to deliver
@@ -29,7 +42,7 @@ class OrdersController < ApplicationController
             item.product.decrement(:quantity, item.quantity).save
         end
 
-        @order.update(status: 'sent')
+        @order.update(status: 'sent', sent_at: Time.now)
 
         render json: {
             success: true,
@@ -73,10 +86,16 @@ class OrdersController < ApplicationController
 
     def index_grouped
         if params[:status]
-            @orders = Order.where(status: params[:status]).group_by(&:status)
+            @orders = Order.where(status: params[:status])
         else
-            @orders = Order.all.group_by(&:status)
+            @orders = Order.all
         end
+
+        if params[:last]
+            @orders = @orders.order(updated_at: :desc).limit(params[:last])
+        end
+
+        @orders = @orders.group_by(&:status)
 
         render json: { orders: @orders }, include: [:items], status: :ok
     end

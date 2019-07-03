@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_19_165403) do
+ActiveRecord::Schema.define(version: 2019_06_29_192038) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -34,11 +34,11 @@ ActiveRecord::Schema.define(version: 2019_06_19_165403) do
   end
 
   create_table "addresses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "address"
     t.string "cep"
     t.bigint "client_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "address"
     t.index ["client_id"], name: "index_addresses_on_client_id"
   end
 
@@ -61,8 +61,8 @@ ActiveRecord::Schema.define(version: 2019_06_19_165403) do
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "address"
     t.string "phone"
+    t.string "address"
   end
 
   create_table "items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 2019_06_19_165403) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "delivery_address"
+    t.timestamp "sent_at"
     t.index ["client_id"], name: "index_orders_on_client_id"
   end
 

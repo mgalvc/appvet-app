@@ -1,6 +1,6 @@
 class ClientsController < ApplicationController
     before_action :authorize_request, except: :create
-    before_action :find_client, only: [:update, :destroy, :get_waiting_items, :get_sent_items]
+    before_action :find_client, only: [:update, :destroy, :get_waiting_items, :get_sent_items, :get_orders, :shipping_tax]
 
     # POST /clients
     def create
@@ -69,6 +69,18 @@ class ClientsController < ApplicationController
         render json: { message: 'Cliente destruído' }, status: :ok
     end
 
+    def get_orders
+        @orders = @client.orders.where(status: params[:status])
+
+        if params[:last]
+            @orders = @orders.order(updated_at: :desc).limit(params[:last])
+        end
+
+        @orders = @orders.group_by(&:status)
+
+        render json: { orders: @orders }, include: [:items], status: :ok
+    end
+
     # GET /clients/:id/waiting_items
     def get_waiting_items
         # each order has a list of items
@@ -117,6 +129,19 @@ class ClientsController < ApplicationController
         render json: { items: items }, status: :ok
     rescue ActiveRecord::RecordNotFound
         render json: { error: 'No orders found' }, status: :not_found
+    end
+
+    def shipping_tax
+        whitelist = [
+            'sim',
+            'santa monica',
+            'santa mônica'
+        ]
+
+        neighborhood = @client.address.split('//')[2]
+
+        render json: { discountLimit: 50, tax: 10, eligible: whitelist.include?(neighborhood.strip.downcase) }, status:
+            :ok
     end
 
     private
