@@ -23,4 +23,6 @@ Rails.application.routes.draw do
     put '/products/:id/increment', to: 'products#increment'
     put '/products/:id/sold', to: 'products#sold'
 
+    get '/admin/overview', to: 'admin#overview'
+
 end
