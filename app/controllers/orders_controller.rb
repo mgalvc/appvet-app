@@ -13,6 +13,15 @@ class OrdersController < ApplicationController
             },
             message: 'Ordem recebida com sucesso'
         }, status: :created
+
+        History.create({
+            client: Client.find(@order.client_id).name,
+            order_date: @order.created_at,
+            delivery_date: @order.updated_at,
+            delivery_address: @order.delivery_address,
+            price: @order.price,
+            products: get_products(@order.items)
+                       })
     end
 
     def send_order
@@ -152,6 +161,16 @@ class OrdersController < ApplicationController
     end
 
     private
+
+    def get_products(items)
+        products = []
+        for item in items
+            product = Product.find(item.product_id)
+            products.push("#{item.quantity} #{product.name}")
+        end
+
+        return products.join(', ')
+    end
 
     def find_order
         @order = Order.find(params[:id])

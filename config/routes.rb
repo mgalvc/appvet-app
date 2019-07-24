@@ -7,7 +7,9 @@ Rails.application.routes.draw do
 
     get '/brands/listing', to: 'brands#listing'
 
-    resources :brands, :products, :clients, :orders
+    get '/histories/bill', to: 'histories#bill'
+
+    resources :brands, :products, :clients, :orders, :histories
 
     get '/orders_grouped', to: 'orders#index_grouped'
     get '/order_items/:id', to: 'orders#items'
